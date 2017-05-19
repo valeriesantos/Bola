@@ -15,8 +15,13 @@ import javafx.scene.transform.Translate;
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Button;
 import javafx.animation.Animation;
+import java.util.Random;
+
 
 public class BolaRoja extends Application { 
+    static int dx = 1;
+    static int dy = 1;
+    
     public static void main(String args[]) { 
         launch(args) ; 
     } 
@@ -24,42 +29,42 @@ public class BolaRoja extends Application {
     @Override 
     public void start(Stage stage) { 
 
-        Circle circle = new Circle() ; 
-
-
+        Circle circle = new Circle() ;
         Group root = new Group(circle) ;
+        Scene scene = new Scene(root, 500, 500) ;  
+        Random randomNumbers = new Random();
+        
+        circle.setRadius(25.0f) ; 
+        circle.setCenterX(25+randomNumbers.nextInt(350)) ;
+        circle.setCenterY(25 +randomNumbers.nextInt(350));
+        
+        Timeline keyframe = new Timeline(new KeyFrame(Duration.millis(1), 
 
-        circle.setRadius(50.0f) ; 
-        circle.setCenterX(250.0f);
-        circle.setCenterY(250.0f);
-        Button button = new Button("Pulsar para parar");
-        root.getChildren().add(button);
-
-        Timeline keyframe = new Timeline(new KeyFrame(Duration.millis(20), 
+        
                     new EventHandler<ActionEvent>() {
                         @Override public void handle(ActionEvent t) {
 
-                            circle.setTranslateX(circle.getTranslateX() + 5 );
-                            circle.setTranslateY(circle.getTranslateY() + 5);
+                            double xMin = circle.getBoundsInParent().getMinX();
+                            double yMin = circle.getBoundsInParent().getMinY();
+                            double xMax = circle.getBoundsInParent().getMaxX();
+                            double yMax = circle.getBoundsInParent().getMaxY();
+
+                            if (xMin < 0 || xMax > scene.getWidth()) {
+                                dx = dx * -1;
+                            }
+                            if (yMin < 0 || yMax > scene.getHeight()) {
+                                dy = dy * -1;
+                            }
+
+                            circle.setTranslateX(circle.getTranslateX() + dx);
+                            circle.setTranslateY(circle.getTranslateY() + dy);
+
                         }
                     }));
 
-        button.setOnAction(event -> {
-            if(keyframe.getStatus() == Animation.Status.RUNNING){
-                keyframe.stop();
-            }
-            
-            else{
-                keyframe.play();
-            }
-            });
-
         keyframe.setCycleCount(Timeline.INDEFINITE);
 
-        button.setLayoutX(0);
-        button.setLayoutY(50);
 
-        Scene scene = new Scene(root, 500, 500) ;  
         stage.setTitle("Circle") ; 
         circle.setFill(Color.RED) ; 
 
