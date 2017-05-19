@@ -19,8 +19,8 @@ import java.util.Random;
 
 
 public class BolaRoja extends Application { 
-    static int dx = 1;
-    static int dy = 1;
+    private int velocidadX = 10;
+    private int velocidadY = 20;
     
     public static void main(String args[]) { 
         launch(args) ; 
@@ -38,7 +38,7 @@ public class BolaRoja extends Application {
         circle.setCenterX(25+randomNumbers.nextInt(350)) ;
         circle.setCenterY(25 +randomNumbers.nextInt(350));
         
-        Timeline keyframe = new Timeline(new KeyFrame(Duration.millis(1), 
+        Timeline keyframe = new Timeline(new KeyFrame(Duration.millis(10), 
 
         
                     new EventHandler<ActionEvent>() {
@@ -50,14 +50,14 @@ public class BolaRoja extends Application {
                             double yMax = circle.getBoundsInParent().getMaxY();
 
                             if (xMin < 0 || xMax > scene.getWidth()) {
-                                dx = dx * -1;
+                                velocidadX = velocidadX * -1;
                             }
                             if (yMin < 0 || yMax > scene.getHeight()) {
-                                dy = dy * -1;
+                                velocidadY = velocidadY * -1;
                             }
 
-                            circle.setTranslateX(circle.getTranslateX() + dx);
-                            circle.setTranslateY(circle.getTranslateY() + dy);
+                            circle.setTranslateX(circle.getTranslateX() + velocidadX);
+                            circle.setTranslateY(circle.getTranslateY() + velocidadY);
 
                         }
                     }));
