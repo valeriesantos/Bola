@@ -14,6 +14,7 @@ import javafx.util.Duration;
 import javafx.scene.transform.Translate;
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Button;
+import javafx.animation.Animation;
 
 public class BolaRoja extends Application { 
     public static void main(String args[]) { 
@@ -34,18 +35,23 @@ public class BolaRoja extends Application {
         Button button = new Button("Pulsar para parar");
         root.getChildren().add(button);
 
-        Timeline keyframe = new Timeline(new KeyFrame(Duration.millis(100), 
+        Timeline keyframe = new Timeline(new KeyFrame(Duration.millis(20), 
                     new EventHandler<ActionEvent>() {
                         @Override public void handle(ActionEvent t) {
 
-                            circle.setTranslateX(circle.getTranslateX() + 20 );
-                            circle.setTranslateY(circle.getTranslateY() + 20);
+                            circle.setTranslateX(circle.getTranslateX() + 5 );
+                            circle.setTranslateY(circle.getTranslateY() + 5);
                         }
                     }));
 
         button.setOnAction(event -> {
+            if(keyframe.getStatus() == Animation.Status.RUNNING){
                 keyframe.stop();
-
+            }
+            
+            else{
+                keyframe.play();
+            }
             });
 
         keyframe.setCycleCount(Timeline.INDEFINITE);
