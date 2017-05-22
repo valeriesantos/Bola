@@ -16,12 +16,15 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.control.Button;
 import javafx.animation.Animation;
 import java.util.Random;
-
+import javafx.scene.shape.Rectangle; 
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 
 public class BolaRoja extends Application { 
     private int velocidadX = 10;
     private int velocidadY = 20;
-    
+    private int velocidadxRectangle = 1;
+
     public static void main(String args[]) { 
         launch(args) ; 
     } 
@@ -30,17 +33,19 @@ public class BolaRoja extends Application {
     public void start(Stage stage) { 
 
         Circle circle = new Circle() ;
-        Group root = new Group(circle) ;
+        Rectangle rectangle = new Rectangle(150,450,150,30) ;
+                rectangle.setFill(Color.BLUE) ; 
+
+        Group root = new Group(circle , rectangle) ;
         Scene scene = new Scene(root, 500, 500) ;  
         Random randomNumbers = new Random();
-        
+
         circle.setRadius(25.0f) ; 
         circle.setCenterX(25+randomNumbers.nextInt(350)) ;
-        circle.setCenterY(25 +randomNumbers.nextInt(350));
-        
+        circle.setCenterY(25+randomNumbers.nextInt(350));
+
         Timeline keyframe = new Timeline(new KeyFrame(Duration.millis(10), 
 
-        
                     new EventHandler<ActionEvent>() {
                         @Override public void handle(ActionEvent t) {
 
@@ -58,19 +63,33 @@ public class BolaRoja extends Application {
 
                             circle.setTranslateX(circle.getTranslateX() + velocidadX);
                             circle.setTranslateY(circle.getTranslateY() + velocidadY);
-
+                            rectangle.setTranslateX(rectangle.getTranslateX() +velocidadxRectangle);
                         }
                     }));
 
         keyframe.setCycleCount(Timeline.INDEFINITE);
-
-
         stage.setTitle("Circle") ; 
         circle.setFill(Color.RED) ; 
+
+
+        scene.setOnKeyPressed(event -> {             
+                    if(event.getCode() == KeyCode.RIGHT ){
+                        velocidadxRectangle =  1;
+                    }
+                    
+                    else if(event.getCode() == KeyCode.LEFT){
+                        velocidadxRectangle =  -1; //Cambiamos direccion del rectangulo
+                    }
+                  
+                    rectangle.setTranslateX(rectangle.getTranslateX() + velocidadxRectangle);
+                    event.consume();
+                });
+           
 
         stage.setScene(scene); 
         stage.show();
         keyframe.play();
+        
     }
 } 
 
