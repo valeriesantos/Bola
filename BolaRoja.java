@@ -21,9 +21,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
 
 public class BolaRoja extends Application { 
-    private int velocidadX = 10;
-    private int velocidadY = 20;
-    private int velocidadxRectangle = 1;
+    private int velocidadX = 1;
+    private int velocidadY = 1;
+    private int velocidadxRectangle = 2;
 
     public static void main(String args[]) { 
         launch(args) ; 
@@ -33,19 +33,18 @@ public class BolaRoja extends Application {
     public void start(Stage stage) { 
 
         Circle circle = new Circle() ;
-        Rectangle rectangle = new Rectangle(150,450,150,30) ;
-                rectangle.setFill(Color.BLUE) ; 
+        Rectangle rectangle = new Rectangle(150,450,100,20) ;
+        rectangle.setFill(Color.BLUE) ; 
 
         Group root = new Group(circle , rectangle) ;
         Scene scene = new Scene(root, 500, 500) ;  
         Random randomNumbers = new Random();
 
-        circle.setRadius(25.0f) ; 
-        circle.setCenterX(25+randomNumbers.nextInt(350)) ;
-        circle.setCenterY(25+randomNumbers.nextInt(350));
+        circle.setRadius(20.0f) ; 
+        circle.setCenterX(20+randomNumbers.nextInt(350)) ;
+        circle.setCenterY(20+randomNumbers.nextInt(350));
 
         Timeline keyframe = new Timeline(new KeyFrame(Duration.millis(10), 
-
                     new EventHandler<ActionEvent>() {
                         @Override public void handle(ActionEvent t) {
 
@@ -57,7 +56,11 @@ public class BolaRoja extends Application {
                             if (xMin < 0 || xMax > scene.getWidth()) {
                                 velocidadX = velocidadX * -1;
                             }
-                            if (yMin < 0 || yMax > scene.getHeight()) {
+                            if (yMin < 0) {
+                                velocidadY = velocidadY * -1;
+                            }
+                            
+                            if(circle.getBoundsInParent().intersects(rectangle.getBoundsInParent())){
                                 velocidadY = velocidadY * -1;
                             }
 
@@ -71,25 +74,23 @@ public class BolaRoja extends Application {
         stage.setTitle("Circle") ; 
         circle.setFill(Color.RED) ; 
 
-
         scene.setOnKeyPressed(event -> {             
-                    if(event.getCode() == KeyCode.RIGHT ){
-                        velocidadxRectangle =  1;
-                    }
-                    
-                    else if(event.getCode() == KeyCode.LEFT){
-                        velocidadxRectangle =  -1; //Cambiamos direccion del rectangulo
-                    }
-                  
-                    rectangle.setTranslateX(rectangle.getTranslateX() + velocidadxRectangle);
-                    event.consume();
-                });
-           
+                if(event.getCode() == KeyCode.RIGHT ){
+                    velocidadxRectangle =  1;
+                }
+
+                else if(event.getCode() == KeyCode.LEFT){
+                    velocidadxRectangle =  -1; //Cambiamos direccion del rectangulo
+                }
+
+                rectangle.setTranslateX(rectangle.getTranslateX() + velocidadxRectangle);
+                event.consume();
+            });
 
         stage.setScene(scene); 
         stage.show();
         keyframe.play();
-        
+
     }
 } 
 
