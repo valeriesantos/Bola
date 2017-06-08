@@ -42,10 +42,15 @@ public class BolaRoja extends Application {
     private final long[] start = new long[STAR_COUNT];
     private final Random random = new Random();
     private int tiempoEnSegundos;
+    private static final  int ANCHO_LADRILLO = 50;
+    private static final int ALTO_LADRILLO = 20;
+    private int ladrillosEliminados;
+    private static final int ANCHO_ESCENA =500;
+    private static final int LARGO_ESCENA =500;
 
     public static void main(String args[]) { 
         launch(args) ; 
-    } 
+    }
 
     @Override 
     public void start(Stage stage) { 
@@ -62,24 +67,35 @@ public class BolaRoja extends Application {
         rectangle.setArcWidth(10);
         rectangle.setArcHeight(10);
 
-        Group root = new Group(circle , rectangle ,iv) ;
-        Scene scene = new Scene(root, 500, 500);
-        Random randomNumbers = new Random();
+        //añadir label con el numero de ladrillos rotos
+        Label ladrillosRotos = new Label();
+        ladrillosRotos.setTranslateX(250);
+        //añadir label al final el juego
+        Label winner = new Label();
+        winner.setTranslateX(200); 
+        winner.setTranslateY(250);
+
+        //añadir elementos al grupo
+        Group root = new Group(circle , rectangle ,iv, ladrillosRotos, winner) ;
+        Scene scene = new Scene(root, 500, 500); // definimos escena
 
         //creamos la bola
         circle.setRadius(RADIO) ; 
+        Random randomNumbers = new Random();
         circle.setCenterX(RADIO +randomNumbers.nextInt(350)) ;
-        circle.setCenterY(RADIO +randomNumbers.nextInt(350));
+        circle.setCenterY(RADIO +randomNumbers.nextInt(250));
 
-        ArrayList <Rectangle> ladrillo = new ArrayList<Rectangle>();
-        Random posicionesLadrillos = new Random();
 
         //primer ladrillo
-
+        
+        //primero creamos arraylist
+        ArrayList <Rectangle> ladrillo = new ArrayList<Rectangle>();
+        Random posicionesLadrillos = new Random();
         Rectangle ladrillos1 = new Rectangle();
-
+       
+        //definimos el ladrillo
         ladrillos1.setWidth(50);
-        ladrillos1.setHeight(10);
+        ladrillos1.setHeight(20);
         ladrillos1.setTranslateX(posicionesLadrillos.nextInt(500 - 50));
         ladrillos1.setTranslateY(posicionesLadrillos.nextInt(250));
         ladrillos1.setFill(Color.GREEN);
@@ -87,47 +103,46 @@ public class BolaRoja extends Application {
         ladrillos1.setArcHeight(20);
         ladrillos1.setArcWidth(20);
         ladrillo.add(ladrillos1);
-        root.getChildren().add(ladrillos1);
+        root.getChildren().add(ladrillos1);//añadimos al grupo el ladrillo
 
         for(int cont=0;cont<4;cont++){         
-            //creamos ladrillos//
+            //creamos ladrillo//
             Rectangle ladrillos2 = new Rectangle();
-            ladrillos2.setWidth(50);
-            ladrillos2.setHeight(10);
-            ladrillos2.setTranslateX(posicionesLadrillos.nextInt(500 - 50));
-            ladrillos2.setTranslateY(posicionesLadrillos.nextInt(250));
+            ladrillos2.setWidth(ANCHO_LADRILLO);
+            ladrillos2.setHeight(ALTO_LADRILLO);
+            ladrillos2.setTranslateX(posicionesLadrillos.nextInt(ANCHO_ESCENA - ANCHO_LADRILLO));
+            ladrillos2.setTranslateY(20 + posicionesLadrillos.nextInt(LARGO_ESCENA/2 - 100));
             ladrillos2.setFill(Color.GREEN);
             ladrillos2.setStroke(Color.BLACK);
-            ladrillos2.setVisible(false);
+            ladrillos2.setVisible(false);// de momento invisible 
             ladrillos2.setArcHeight(20);
             ladrillos2.setArcWidth(20);
             root.getChildren().add(ladrillos2);
 
             boolean ladrilloCorrecto = true;
-            for(cont = 0;cont<ladrillo.size();cont++){  //recorremos arraylist 
+            for(cont = 0;cont<ladrillo.size();cont++){  //recorremos arraylist hasta encontrar ladrillo valido
                 Shape shape = Shape.intersect(ladrillo.get(cont),ladrillos2);
                 double ancho = shape.getBoundsInParent().getWidth();
-                System.out.println(ancho);
 
                 if(ancho != -1){ //si se solapan no lo pintamos
                     ladrilloCorrecto  = false;
                 }
-               
+
             }
 
-            if(ladrilloCorrecto == true ){ //si los ladrillos no se superponen los hacemos visibles y los pintamos.
-                ladrillo.add(ladrillos2);
-                ladrillos2.setVisible(true);
-
+            if(ladrilloCorrecto){ //si los ladrillos no se superponen los hacemos visibles y los pintamos.
+                ladrillo.add(ladrillos2);//añadimos al arraylist
+                ladrillos2.setVisible(true);//y hacemos visible
             }
 
         }
 
+        tiempoEnSegundos = 0; //inicializar el tiempo
+        
         Label tiempoPasado = new Label("0");
-
         root.getChildren().add(tiempoPasado);
 
-        tiempoEnSegundos = 0;
+        
 
         keyframe = new Timeline(new KeyFrame(Duration.millis(10), 
                 new EventHandler<ActionEvent>() {
@@ -165,7 +180,25 @@ public class BolaRoja extends Application {
                         double xMaxR = rectangle.getBoundsInParent().getMaxX();
 
                         if(xMinR <= 0 || xMaxR  >= scene.getWidth()){
-                            velocidadxRectangle = 0;                                
+                            velocidadxRectangle = 0;                             
+
+                        }
+
+
+                        for(int contador = 0;contador<ladrillo.size();contador++){
+
+                            if(circle.getBoundsInParent().intersects(ladrillo.get(contador).getBoundsInParent())){
+                                velocidadY = velocidadY * -1;
+
+                                ladrillo.remove(contador).setVisible(false);
+                                ladrillosEliminados++;
+                                                        ladrillosRotos.setText("Ladrillos eliminados : " +  ladrillosEliminados );
+                            } 
+
+                            if(ladrillo.size() == 0 ){
+                                winner.setText("YOU WIN!!");
+                                keyframe.stop();
+                            }
 
                         }
 
@@ -185,7 +218,7 @@ public class BolaRoja extends Application {
         circle.setFill(Color.RED) ; 
 
         scene.setOnKeyPressed(event -> {             
-                if(event.getCode() == KeyCode.RIGHT )
+                if(event.getCode() == KeyCode.RIGHT )//accion al pulsar tecla derecha
                 {
 
                     if(rectangle.getBoundsInParent().getMaxX()  <500  ){
@@ -194,7 +227,7 @@ public class BolaRoja extends Application {
 
                 }
 
-                else if(event.getCode() == KeyCode.LEFT)
+                else if(event.getCode() == KeyCode.LEFT)//accion al pulsar tecla izq
                 {
 
                     if(rectangle.getBoundsInParent().getMinX()  > 0){
@@ -206,9 +239,7 @@ public class BolaRoja extends Application {
                 event.consume();
             });
 
-        stage.setScene(scene); 
-        stage.show();
-        keyframe.play();
+        
 
         TimerTask tarea = new TimerTask() {
                 @Override
@@ -216,8 +247,12 @@ public class BolaRoja extends Application {
                     tiempoEnSegundos++;
                 }                        
             };
+            
         Timer timer = new Timer();
         timer.schedule(tarea, 0, 1000);
+        stage.setScene(scene); 
+        stage.show();
+        keyframe.play();
 
     }
 
