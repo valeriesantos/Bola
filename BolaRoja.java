@@ -68,7 +68,7 @@ public class BolaRoja extends Application {
         rectangle.setArcHeight(10);
 
         //añadir label con el numero de ladrillos rotos
-        Label ladrillosRotos = new Label();
+        Label ladrillosRotos = new Label("Ladrillos destruidos:  0" );
         ladrillosRotos.setTranslateX(250);
         //añadir label al final el juego
         Label winner = new Label();
